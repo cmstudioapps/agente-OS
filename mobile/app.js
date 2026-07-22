@@ -761,7 +761,6 @@ if (btnStretchH && btnStretchV) {
   });
 }
 
-const inputKeyboard = document.getElementById('keyboard-input');
 if (inputKeyboard) {
   inputKeyboard.addEventListener('input', (e) => {
     if (!ws) return;
