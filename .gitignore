@@ -1,0 +1,6 @@
+node_modules/
+.WWebJS/
+db.json
+*.log
+dist/
+build/

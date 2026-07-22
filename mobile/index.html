@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Remote Monitor Agent</title>
+  
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="trackpad.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- Tela de Login -->
+  <div id="login-screen" class="screen">
+    <div class="login-container">
+      <div class="login-icon"><i data-lucide="shield-check"></i></div>
+      <h1>Remote Monitor</h1>
+      <p>Conecte-se ao seu Agent de forma segura.</p>
+      
+      <div class="input-group">
+        <i data-lucide="link"></i>
+        <input type="text" id="tunnel-url" placeholder="Tunnel URL (ex: https://meu-agent.loca.lt)">
+      </div>
+      
+      <div class="input-group">
+        <i data-lucide="key"></i>
+        <input type="password" id="auth-token" placeholder="Senha de Acesso (PIN)">
+      </div>
+      
+      <button id="btn-connect" class="primary-btn">Conectar</button>
+      <p id="login-error" class="error-text"></p>
+    </div>
+  </div>
+
+  <!-- App Principal (Escondido até logar) -->
+  <div id="app-screen" class="screen hidden">
+    <!-- Header -->
+    <header>
+      <div class="header-left">
+        <button class="icon-btn"><i data-lucide="menu"></i></button>
+        <div class="host-info">
+          <h2 id="host-name">PC-01</h2>
+          <span class="status-badge"><span class="dot"></span> Online</span>
+        </div>
+      </div>
+      <button class="icon-btn" id="btn-disconnect"><i data-lucide="log-out"></i></button>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="main-content">
+      
+      <!-- ABA: DASHBOARD -->
+      <section id="tab-dashboard" class="tab-content active">
+        
+        <div class="section-title">
+          <h3>Monitoramento em tempo real</h3>
+          <i data-lucide="refresh-cw"></i>
+        </div>
+
+        <div class="grid-2">
+          <!-- CPU Card -->
+          <div class="card stat-card">
+            <div class="stat-header">
+              <span class="stat-label">CPU</span>
+              <span class="stat-value" id="val-cpu">0%</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-cpu"></canvas>
+            </div>
+          </div>
+
+          <!-- RAM Card -->
+          <div class="card stat-card">
+            <div class="stat-header">
+              <span class="stat-label">RAM</span>
+              <span class="stat-value" id="val-ram">0%</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-ram"></canvas>
+            </div>
+          </div>
+
+          <!-- Disk Card -->
+          <div class="card stat-card">
+            <div class="stat-header">
+              <span class="stat-label">DISCO</span>
+              <span class="stat-value" id="val-disk">0%</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-disk"></canvas>
+            </div>
+          </div>
+
+          <!-- Network Card -->
+          <div class="card stat-card">
+            <div class="stat-header">
+              <span class="stat-label">REDE</span>
+              <span class="stat-value" id="val-net">0 kb/s</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-net"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card sys-info-card">
+          <h3>Informações do sistema</h3>
+          <ul class="sys-info-list">
+            <li><span>Sistema</span> <span id="info-os">-</span></li>
+            <li><span>Hostname</span> <span id="info-hostname">-</span></li>
+            <li><span>Arquitetura</span> <span id="info-arch">-</span></li>
+            <li><span>Uptime</span> <span id="info-uptime">-</span></li>
+            <li><span>Agente</span> <span>v1.0.0</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ABA: AÇÕES RÁPIDAS (Config) -->
+      <section id="tab-acoes" class="tab-content">
+        <div class="section-title">
+          <h3>Ações rápidas</h3>
+        </div>
+
+        <div class="action-category">
+          <h4>Sistema</h4>
+          <div class="grid-3">
+            <button class="action-btn" data-action="reiniciar">
+              <i data-lucide="refresh-ccw"></i>
+              <span>Reiniciar</span>
+            </button>
+            <button class="action-btn" data-action="desligar">
+              <i data-lucide="power"></i>
+              <span>Desligar</span>
+            </button>
+            <button class="action-btn" data-action="ver_ip">
+              <i data-lucide="info"></i>
+              <span>Ver Info</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="action-category">
+          <h4>Rede</h4>
+          <div class="grid-2">
+            <button class="action-btn" data-action="ver_ip">
+              <i data-lucide="map-pin"></i>
+              <span>Ver IP</span>
+            </button>
+            <button class="action-btn" data-action="testar_conexao">
+              <i data-lucide="wifi"></i>
+              <span>Testar conexão</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABA: PROCESSOS -->
+      <section id="tab-processos" class="tab-content">
+        <div class="section-title">
+          <h3>Processos</h3>
+          <div class="actions-right">
+            <button class="icon-btn"><i data-lucide="search"></i></button>
+            <button class="icon-btn"><i data-lucide="more-vertical"></i></button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="modern-table" id="process-table">
+            <thead>
+              <tr>
+                <th>Processo</th>
+                <th>PID</th>
+                <th>CPU</th>
+                <th>Memória</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Preenchido via JS -->
+            </tbody>
+          </table>
+        </div>
+        
+        <button id="btn-kill-process" class="danger-btn block-btn" disabled>Encerrar processo selecionado</button>
+      </section>
+
+      <!-- ABA: ARQUIVOS -->
+      <section id="tab-arquivos" class="tab-content">
+        <div class="section-title">
+          <h3>Arquivos</h3>
+          <div class="actions-right">
+            <input type="file" id="file-upload-input" style="display: none;">
+            <button class="icon-btn" id="btn-upload-file" title="Fazer Upload"><i data-lucide="upload"></i></button>
+            <button class="icon-btn"><i data-lucide="home"></i></button>
+          </div>
+        </div>
+
+        <div class="path-breadcrumb" id="file-path">C:\ > Users > ...</div>
+
+        <div class="file-explorer" id="file-list">
+          <!-- Preenchido via JS -->
+        </div>
+      </section>
+
+      <!-- ABA: TERMINAL -->
+      <section id="tab-terminal" class="tab-content">
+        <div class="section-title">
+          <h3>Terminal Remoto</h3>
+          <button class="icon-btn" id="btn-clear-term"><i data-lucide="trash-2"></i></button>
+        </div>
+
+        <div id="terminal-output" class="terminal-output"></div>
+        
+        <div class="terminal-input-group">
+          <input type="text" id="cmd-input" placeholder="Digite um comando...">
+          <button id="btn-send-cmd"><i data-lucide="send"></i></button>
+        </div>
+      </section>
+
+      <!-- ABA: MOUSE E TECLADO -->
+      <section id="tab-mouse" class="tab-content">
+        <div class="section-title">
+          <h3>Trackpad Virtual</h3>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <select id="select-quality" style="background: #1e293b; color: #94a3b8; border: 1px solid #334155; border-radius: 6px; padding: 4px; font-size: 12px; display: none;">
+              <option value="high">Alta</option>
+              <option value="medium">Média</option>
+              <option value="low">Baixa</option>
+            </select>
+            <button class="icon-btn" id="btn-stretch-h" title="Esticar Horizontal" style="display: none;"><i data-lucide="stretch-horizontal"></i></button>
+            <button class="icon-btn" id="btn-stretch-v" title="Esticar Vertical" style="display: none;"><i data-lucide="stretch-vertical"></i></button>
+            <button class="icon-btn" id="btn-pan-mode" title="Modo Mover Tela" style="display: none;"><i data-lucide="hand"></i></button>
+            <button class="icon-btn" id="btn-zoom-out" title="Reduzir Zoom" style="display: none;"><i data-lucide="zoom-out"></i></button>
+            <button class="icon-btn" id="btn-zoom-in" title="Aumentar Zoom" style="display: none;"><i data-lucide="zoom-in"></i></button>
+            <button class="icon-btn" id="btn-save-print" title="Salvar Screenshot da Tela" style="display: none;"><i data-lucide="camera"></i></button>
+          </div>
+        </div>
+
+        <div class="trackpad-container" id="trackpad-area" style="position: relative; padding: 0; min-height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+          <video id="screen-stream" autoplay playsinline muted style="width: 100%; border-radius: 8px; display: none; aspect-ratio: 16/9; background: #000; object-fit: contain; pointer-events: none;"></video>
+          <div class="trackpad-hint" id="trackpad-hint" style="position: absolute; pointer-events: none;">
+            <i data-lucide="mouse-pointer-2"></i>
+            <span>Deslize sobre o vídeo para mover</span>
+          </div>
+        </div>
+
+        <div class="mouse-buttons-container">
+          <button class="mouse-btn-left" id="btn-click-left">Esq</button>
+          
+          <div class="mouse-wheel-container">
+            <div class="mouse-wheel" id="btn-scroll"></div>
+          </div>
+          
+          <button class="mouse-btn-right" id="btn-click-right">Dir</button>
+        </div>
+
+        <div class="keyboard-container" style="margin-top: 20px;">
+          <h4 style="margin-bottom: 8px; color: #cbd5e1;">Teclado em Tempo Real</h4>
+          <textarea id="keyboard-input" class="modern-input" placeholder="Digite aqui... as teclas são enviadas em tempo real" style="height: 80px; resize: none;"></textarea>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-target="tab-dashboard">
+        <i data-lucide="home"></i>
+        <span>Dash</span>
+      </button>
+      <button class="nav-btn" data-target="tab-terminal">
+        <i data-lucide="terminal"></i>
+        <span>Term</span>
+      </button>
+      <button class="nav-btn" data-target="tab-arquivos">
+        <i data-lucide="folder"></i>
+        <span>Arq</span>
+      </button>
+      <button class="nav-btn" data-target="tab-processos">
+        <i data-lucide="cpu"></i>
+        <span>Proc</span>
+      </button>
+      <button class="nav-btn" data-target="tab-mouse">
+        <i data-lucide="mouse-pointer-2"></i>
+        <span>Mouse</span>
+      </button>
+      <button class="nav-btn" data-target="tab-acoes">
+        <i data-lucide="settings"></i>
+        <span>Conf</span>
+      </button>
+    </nav>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

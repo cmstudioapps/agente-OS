@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agente OS</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="glass-container">
+    
+    <header class="header">
+      <div class="logo">
+        <i data-lucide="cpu" class="logo-icon"></i>
+        <h1>Agente OS</h1>
+      </div>
+      <div class="status-indicator">
+        <span class="dot" id="status-dot"></span>
+        <span id="status-text">Iniciando...</span>
+      </div>
+    </header>
+
+    <!-- TELA DE CONFIGURAÇÃO (se precisar de senha root / zap) -->
+    <main id="setup-screen" class="screen">
+      <div class="glass-card">
+        <h2>Configurações do Servidor</h2>
+        <p>Preencha os dados abaixo para iniciar o agente.</p>
+        
+        <div class="input-group">
+          <label><i data-lucide="key"></i> Senha do Sistema (Linux / Root)</label>
+          <input type="password" id="input-sudo" placeholder="Sua senha para o mouse virtual...">
+          <small>Fica salva localmente apenas no seu PC.</small>
+        </div>
+
+        <div class="input-group">
+          <label style="display:flex; justify-content:space-between; align-items:center;">
+            <span><i data-lucide="message-square"></i> Habilitar WhatsApp</span>
+            <input type="checkbox" id="toggle-wpp" checked style="width: auto; transform: scale(1.2);">
+          </label>
+          <input type="text" id="input-wpp" placeholder="Número com DDD (Ex: 5511999999999)">
+          <small>Desative para poupar RAM e Processamento (O Chrome invisível não será aberto).</small>
+        </div>
+
+        <button class="btn-primary" id="btn-start-server">
+          <i data-lucide="play"></i> Ligar Servidor
+        </button>
+      </div>
+    </main>
+
+    <!-- TELA DO SERVIDOR ATIVO -->
+    <main id="active-screen" class="screen hidden">
+      <div class="glass-card main-card">
+        <div class="server-info">
+          <h2>Servidor Online</h2>
+          <p>Acesse pelo celular usando os dados abaixo:</p>
+        </div>
+
+        <div class="credentials">
+          <div class="cred-item">
+            <span class="label">URL do Túnel:</span>
+            <div class="value-box">
+              <span id="tunnel-url">Aguardando...</span>
+              <button class="icon-btn copy-btn" data-copy="tunnel-url" title="Copiar"><i data-lucide="copy"></i></button>
+            </div>
+          </div>
+          
+          <div class="cred-item">
+            <span class="label">Senha Gerada:</span>
+            <div class="value-box">
+              <span id="auth-token" class="highlight">---</span>
+              <button class="icon-btn copy-btn" data-copy="auth-token" title="Copiar"><i data-lucide="copy"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="webrtc-status">
+          <i data-lucide="monitor-play"></i>
+          <span>O Agente está pronto para capturar a tela.</span>
+        </div>
+      </div>
+    </main>
+
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>
