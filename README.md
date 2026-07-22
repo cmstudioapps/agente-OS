@@ -21,17 +21,21 @@ Agente OS é uma aplicação Desktop (Electron) e Web (Mobile) que permite trans
 
 ## 📦 Pré-requisitos
 
-- **Node.js** (Versão 18 ou 20+)
+### Para rodar o Aplicativo Compilado (.exe / .AppImage)
+- **No Windows:** Nenhum! O `.exe` já embute o Node.js e tudo o que precisa.
 - **No Linux (Wayland):**
-  - **Python 3** (Necessário para controle de input nativo)
-  - É necessário ter o pacote `evdev` instalado no Python:
+  - O app já embute o Node.js, mas como usamos manipulação de hardware de baixo nível, você precisa ter:
+  - **Python 3**
+  - O pacote `evdev` instalado no Python:
     ```bash
     sudo apt install python3-evdev
     # ou
     pip3 install evdev
     ```
-- **No Windows:**
-  - O projeto utiliza a biblioteca nativa `robotjs`. Para a primeira instalação (`npm install`), você precisará ter o pacote de build do Windows instalado. Caso dê erro, rode no PowerShell como Administrador: `npm install --global windows-build-tools` ou certifique-se de ter o Visual Studio Build Tools instalado.
+
+### Para Desenvolvimento (Compilar do zero ou rodar `npm start`)
+- **Node.js** (Versão 18 ou 20+)
+- **No Windows:** O projeto utiliza a biblioteca nativa `robotjs`. Para a primeira instalação (`npm install`), você precisará ter o pacote de build do Windows instalado. Caso dê erro, rode no PowerShell como Administrador: `npm install --global windows-build-tools` ou certifique-se de ter o Visual Studio Build Tools instalado.
 
 ## ⚙️ Instalação
 
