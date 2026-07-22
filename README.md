@@ -22,13 +22,16 @@ Agente OS é uma aplicação Desktop (Electron) e Web (Mobile) que permite trans
 ## 📦 Pré-requisitos
 
 - **Node.js** (Versão 18 ou 20+)
-- **Python 3** (Necessário para controle de input nativo no Linux)
-- No Linux, é necessário ter o pacote `evdev` instalado no Python:
-  ```bash
-  sudo apt install python3-evdev
-  # ou
-  pip3 install evdev
-  ```
+- **No Linux (Wayland):**
+  - **Python 3** (Necessário para controle de input nativo)
+  - É necessário ter o pacote `evdev` instalado no Python:
+    ```bash
+    sudo apt install python3-evdev
+    # ou
+    pip3 install evdev
+    ```
+- **No Windows:**
+  - O projeto utiliza a biblioteca nativa `robotjs`. Para a primeira instalação (`npm install`), você precisará ter o pacote de build do Windows instalado. Caso dê erro, rode no PowerShell como Administrador: `npm install --global windows-build-tools` ou certifique-se de ter o Visual Studio Build Tools instalado.
 
 ## ⚙️ Instalação
 
@@ -51,7 +54,9 @@ Agente OS é uma aplicação Desktop (Electron) e Web (Mobile) que permite trans
    ```
 
 2. **Configuração Inicial:**
-   - Na janela do Electron que se abrirá, insira sua senha de ROOT/SUDO (obrigatório em Linux/Wayland para controlar o mouse).
+   - O aplicativo detecta automaticamente o seu sistema operacional.
+   - **No Linux (Wayland):** Na janela do Electron que se abrirá, insira sua senha de ROOT/SUDO (obrigatório para controlar o mouse em baixo nível).
+   - **No Windows:** O campo de Senha Sudo será ocultado automaticamente e o motor de controle mudará sozinho para o modo Windows.
    - Marque a opção de **Habilitar WhatsApp** e informe o seu número (Ex: `5511999999999`) caso queira receber o link de acesso diretamente no celular.
    - Clique em **Ligar Servidor**.
 
