@@ -12,6 +12,30 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "build": {
+    "appId": "com.cmstudioapps.agenteos",
+    "productName": "Agente OS",
+    "directories": {
+      "output": "dist-app"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "icon.png"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "icon.png"
+    },
+    "mac": {
+      "icon": "icon.png"
+    },
+    "extraResources": [
+      {
+        "from": "icon.png",
+        "to": "icon.png"
+      }
+    ]
+  },
   "dependencies": {
     "@jitsi/robotjs": "^0.6.24",
     "cli-facil": "^1.0.0",
