@@ -1,5 +1,6 @@
 node_modules/
-.WWebJS/
+.wwebjs_auth/
+.wwebjs_cache/
 db.json
 *.log
 dist/
