@@ -4,3 +4,4 @@ db.json
 *.log
 dist/
 build/
+task.md
