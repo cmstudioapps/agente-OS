@@ -20,6 +20,9 @@ export async function getFullSystemStats() {
     disk: diskUsage,
     system: systemInfo.system,
     hostname: systemInfo.hostname,
+    uptime: systemInfo.uptime,
+    battery: systemInfo.battery,
+    temperature: systemInfo.temperature,
     processes: processes
   };
 }

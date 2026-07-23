@@ -29,6 +29,8 @@ const infoOs = document.getElementById('info-os');
 const infoHostname = document.getElementById('info-hostname');
 const infoArch = document.getElementById('info-arch');
 const infoUptime = document.getElementById('info-uptime');
+const infoTemp = document.getElementById('info-temp');
+const infoBattery = document.getElementById('info-battery');
 
 // Terminal
 const termOutput = document.getElementById('terminal-output');
@@ -381,6 +383,19 @@ async function connect(isAutoReconnect = false) {
       infoOs.textContent = data.data.system;
       infoArch.textContent = data.data.arch;
       infoUptime.textContent = formatUptime(data.data.uptime);
+      
+      if (data.data.temperature !== undefined && data.data.temperature !== null && data.data.temperature !== -1) {
+        infoTemp.textContent = `${data.data.temperature.toFixed(1)} °C`;
+      } else {
+        infoTemp.textContent = 'Não suportado';
+      }
+
+      if (data.data.battery && data.data.battery.hasBattery) {
+        const charging = data.data.battery.isCharging ? ' (Carregando)' : (data.data.battery.acConnected ? ' (Na Tomada)' : ' (Bateria)');
+        infoBattery.textContent = `${data.data.battery.percent}%${charging}`;
+      } else {
+        infoBattery.textContent = 'Tomada (Desktop)';
+      }
 
       // Processos
       renderProcesses(data.data.processes || []);
