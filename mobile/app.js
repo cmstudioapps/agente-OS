@@ -308,7 +308,12 @@ function appendToTerminal(text, type = 'sys') {
 btnClearTerm.addEventListener('click', () => termOutput.innerHTML = '');
 
 // --- WEBSOCKET & LOGIN ---
-async function connect() {
+const savedUrl = sessionStorage.getItem('agente_url');
+const savedToken = sessionStorage.getItem('agente_token');
+if (savedUrl) inputUrl.value = savedUrl;
+if (savedToken) inputToken.value = savedToken;
+
+async function connect(isAutoReconnect = false) {
   const url = inputUrl.value.trim();
   const token = inputToken.value.trim();
 
@@ -342,6 +347,8 @@ async function connect() {
     if (data.type === 'auth_result') {
       if (data.success) {
         currentToken = token;
+        sessionStorage.setItem('agente_url', url);
+        sessionStorage.setItem('agente_token', token);
         loginScreen.classList.add('hidden');
         appScreen.classList.remove('hidden');
         loginError.textContent = '';
@@ -430,8 +437,21 @@ async function connect() {
   };
 }
 
-btnConnect.addEventListener('click', connect);
-btnDisconnect.addEventListener('click', () => { if (ws) ws.close(); });
+btnConnect.addEventListener('click', () => connect(false));
+btnDisconnect.addEventListener('click', () => { 
+  sessionStorage.removeItem('agente_url');
+  sessionStorage.removeItem('agente_token');
+  if (ws) ws.close(); 
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && sessionStorage.getItem('agente_url') && sessionStorage.getItem('agente_token')) {
+    if (!ws || ws.readyState === WebSocket.CLOSED) {
+      loginError.textContent = 'Restaurando conexão...';
+      connect(true);
+    }
+  }
+});
 
 // --- AÇÕES & TERMINAL ---
 const actionBtns = document.querySelectorAll('.action-btn');
