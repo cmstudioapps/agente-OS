@@ -446,3 +446,39 @@ main {
   from { background-position: 0 0; }
   to { background-position: 0 -20px; }
 }
+
+/* Responsividade: Paisagem (Landscape) */
+@media (orientation: landscape) and (max-height: 600px) {
+  #tab-mouse {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "title title"
+      "video controls";
+    gap: 15px;
+    height: calc(100vh - 80px); /* Ocupar quase a tela toda */
+  }
+  
+  #tab-mouse .section-title {
+    grid-area: title;
+    margin-bottom: 0;
+  }
+  
+  #trackpad-area {
+    grid-area: video;
+    height: 100%;
+    min-height: unset !important;
+  }
+  
+  .mouse-controls-wrapper {
+    grid-area: controls;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  
+  .mouse-buttons-container {
+    margin-top: 0;
+  }
+}
