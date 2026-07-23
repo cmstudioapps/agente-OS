@@ -103,9 +103,9 @@ if (trackpadArea) {
       panOffsetY += (touch.clientY - lastY);
       updateVideoTransform();
     } else {
-      // Multiplicador 2.5x pra mais agilidade e uso de floats pra não perder movimentos finos
-      mouseFloatX += (touch.clientX - lastX) * 2.5;
-      mouseFloatY += (touch.clientY - lastY) * 2.5;
+      // Multiplicador pra mais agilidade e uso de floats pra não perder movimentos finos
+      mouseFloatX += (touch.clientX - lastX) * mouseSensitivity;
+      mouseFloatY += (touch.clientY - lastY) * mouseSensitivity;
       
       const dx = Math.trunc(mouseFloatX);
       const dy = Math.trunc(mouseFloatY);
@@ -796,22 +796,34 @@ if (btnStretchH && btnStretchV) {
   });
 }
 
+let lastKeyboardValue = '';
 if (inputKeyboard) {
   inputKeyboard.addEventListener('input', (e) => {
     if (!ws) return;
     
-    if (e.inputType === 'insertText' && e.data) {
-      ws.send(JSON.stringify({ type: 'keyboard_type', text: e.data }));
-      appendToTerminal(`Tecla enviada: ${e.data}`, 'sys');
-    } 
-    else if (e.inputType === 'insertLineBreak') {
-      ws.send(JSON.stringify({ type: 'keyboard_key', key: 'enter' }));
-      appendToTerminal(`Enter enviado`, 'sys');
+    const currentVal = inputKeyboard.value;
+    
+    if (currentVal.length > lastKeyboardValue.length) {
+      const addedText = currentVal.substring(lastKeyboardValue.length);
+      ws.send(JSON.stringify({ type: 'keyboard_type', text: addedText }));
+      appendToTerminal(`Texto enviado: ${addedText.replace(/\n/g, '[ENTER]')}`, 'sys');
+    } else if (currentVal.length < lastKeyboardValue.length) {
+      const diff = lastKeyboardValue.length - currentVal.length;
+      for(let i=0; i<diff; i++) {
+        ws.send(JSON.stringify({ type: 'keyboard_key', key: 'backspace' }));
+      }
+      appendToTerminal(`Backspace x${diff}`, 'sys');
     }
-    else if (e.inputType === 'deleteContentBackward') {
-      ws.send(JSON.stringify({ type: 'keyboard_key', key: 'backspace' }));
-      appendToTerminal(`Backspace enviado`, 'sys');
-    }
+    
+    lastKeyboardValue = currentVal;
+  });
+}
+
+const sensitivitySlider = document.getElementById('mouse-sensitivity');
+let mouseSensitivity = 2.5;
+if (sensitivitySlider) {
+  sensitivitySlider.addEventListener('input', (e) => {
+    mouseSensitivity = parseFloat(e.target.value);
   });
 }
 
