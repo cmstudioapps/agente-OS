@@ -259,31 +259,98 @@ main {
 .action-btn svg { width: 24px; height: 24px; color: var(--primary); }
 .action-btn span { font-size: 0.8rem; font-weight: 500; }
 
-/* Tabela Processos */
-.table-container {
+/* Processos - Cards */
+.process-search-bar {
+  position: relative;
+}
+
+.process-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+.process-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
   background: var(--bg-card);
-  border-radius: 12px;
   border: 1px solid var(--border);
-  overflow: hidden;
-  margin-bottom: 15px;
+  border-radius: 12px;
+  transition: all 0.2s;
 }
-.modern-table { width: 100%; border-collapse: collapse; text-align: left; }
-.modern-table th {
-  padding: 12px 15px;
-  font-size: 0.75rem;
+
+.process-card:hover {
+  background: var(--bg-card-hover);
+}
+
+.process-card .proc-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.process-card .proc-icon.user-proc {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--primary);
+}
+
+.process-card .proc-icon.sys-proc {
+  background: rgba(148, 163, 184, 0.15);
   color: var(--text-muted);
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--border);
-  font-weight: 600;
 }
-.modern-table td {
-  padding: 12px 15px;
+
+.process-card .proc-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.process-card .proc-name {
   font-size: 0.85rem;
-  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.modern-table tbody tr { transition: background 0.2s; cursor: pointer; }
-.modern-table tbody tr:hover { background: rgba(255,255,255,0.02); }
-.modern-table tbody tr.selected { background: rgba(59, 130, 246, 0.15); border-left: 3px solid var(--primary); }
+
+.process-card .proc-meta {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+  display: flex;
+  gap: 10px;
+}
+
+.process-card .proc-kill-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.process-card .proc-kill-btn:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+.process-card .proc-kill-btn:active {
+  transform: scale(0.9);
+}
 
 .block-btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 600; cursor: pointer; }
 .danger-btn { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }

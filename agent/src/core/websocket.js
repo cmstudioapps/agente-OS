@@ -62,7 +62,7 @@ export function setupWebSocket(server) {
           const procs = await executor.listProcesses();
           ws.send(JSON.stringify({ type: 'process_list', processes: procs }));
         } else if (data.type === 'kill_process') {
-          const result = await executor.killProcess(data.pid);
+          const result = await executor.killProcess(data.pid, data.name || '');
           ws.send(JSON.stringify({ type: 'kill_result', pid: data.pid, ...result }));
         } else if (data.type === 'mouse_move') {
           executor.moveMouse(data.dx, data.dy);

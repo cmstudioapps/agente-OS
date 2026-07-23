@@ -167,29 +167,16 @@
       <section id="tab-processos" class="tab-content">
         <div class="section-title">
           <h3>Processos</h3>
-          <div class="actions-right">
-            <button class="icon-btn"><i data-lucide="search"></i></button>
-            <button class="icon-btn"><i data-lucide="more-vertical"></i></button>
-          </div>
         </div>
 
-        <div class="table-container">
-          <table class="modern-table" id="process-table">
-            <thead>
-              <tr>
-                <th>Processo</th>
-                <th>PID</th>
-                <th>CPU</th>
-                <th>Memória</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Preenchido via JS -->
-            </tbody>
-          </table>
+        <div class="process-search-bar" style="margin-bottom: 15px;">
+          <input type="text" id="process-search" class="modern-input" placeholder="Buscar processo..." style="padding-left: 40px;">
+          <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--text-muted); pointer-events: none;"></i>
         </div>
-        
-        <button id="btn-kill-process" class="danger-btn block-btn" disabled>Encerrar processo selecionado</button>
+
+        <div class="process-list" id="process-list">
+          <!-- Preenchido via JS -->
+        </div>
       </section>
 
       <!-- ABA: ARQUIVOS -->

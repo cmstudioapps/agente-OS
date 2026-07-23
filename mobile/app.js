@@ -39,10 +39,9 @@ const btnSendCmd = document.getElementById('btn-send-cmd');
 const btnClearTerm = document.getElementById('btn-clear-term');
 
 // Processos
-const processTableBody = document.querySelector('#process-table tbody');
-const btnKillProcess = document.getElementById('btn-kill-process');
-let selectedPid = null;
-let selectedProcessName = '';
+const processList = document.getElementById('process-list');
+const processSearch = document.getElementById('process-search');
+let allProcesses = [];
 
 // Arquivos
 const fileList = document.getElementById('file-list');
@@ -412,9 +411,7 @@ async function connect(isAutoReconnect = false) {
 
     if (data.type === 'kill_result') {
       if (data.success) {
-        appendToTerminal(`Processo ${data.pid} encerrado com sucesso.`, 'sys');
-        selectedPid = null;
-        btnKillProcess.disabled = true;
+        appendToTerminal(`Processo PID ${data.pid} encerrado com sucesso.`, 'sys');
       } else {
         appendToTerminal(`Falha ao encerrar PID ${data.pid}: ${data.output}`, 'error');
       }
@@ -505,52 +502,82 @@ btnSendCmd.addEventListener('click', sendCommand);
 termInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendCommand(); });
 
 // --- PROCESSOS ---
-function renderProcesses(list) {
-  processTableBody.innerHTML = '';
+function renderProcesses(list, filter = '') {
+  allProcesses = list;
+  processList.innerHTML = '';
 
-  list.forEach(p => {
-    const tr = document.createElement('tr');
-    if (selectedPid === p.pid) tr.classList.add('selected');
-    
-    const shieldIcon = p.isSystem ? '<i data-lucide="shield-alert" style="width:14px; height:14px; margin-left:6px; color:var(--text-muted); vertical-align:middle;"></i>' : '';
+  const filtered = filter
+    ? list.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()))
+    : list;
 
-    tr.innerHTML = `
-      <td>${p.name} ${shieldIcon}</td>
-      <td>${p.pid}</td>
-      <td>${p.cpu}%</td>
-      <td>${formatBytes(p.mem * 1024 * 1024)}</td>
+  if (filtered.length === 0) {
+    processList.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding: 30px;">Nenhum processo encontrado</div>';
+    return;
+  }
+
+  filtered.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'process-card';
+
+    const iconClass = p.isSystem ? 'sys-proc' : 'user-proc';
+    const iconName = p.isSystem ? 'shield' : 'cpu';
+
+    card.innerHTML = `
+      <div class="proc-icon ${iconClass}">
+        <i data-lucide="${iconName}" style="width:18px; height:18px;"></i>
+      </div>
+      <div class="proc-info">
+        <div class="proc-name">${p.name}</div>
+        <div class="proc-meta">
+          <span>PID: ${p.pid}</span>
+          <span>CPU: ${p.cpu}%</span>
+          <span>${formatBytes(p.mem * 1024 * 1024)}</span>
+        </div>
+      </div>
+      <button class="proc-kill-btn" title="Encerrar ${p.name}">
+        <i data-lucide="x" style="width:16px; height:16px;"></i>
+      </button>
     `;
-    
-    tr.addEventListener('click', () => {
-      document.querySelectorAll('#process-table tbody tr').forEach(row => row.classList.remove('selected'));
-      tr.classList.add('selected');
-      selectedPid = p.pid;
-      selectedProcessName = p.name;
-      btnKillProcess.disabled = false;
-      btnKillProcess.dataset.isSystem = p.isSystem;
+
+    const killBtn = card.querySelector('.proc-kill-btn');
+    killBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!ws) return;
+
+      if (p.isSystem) {
+        const confirmKill = confirm(`ATENÇÃO: "${p.name}" (PID: ${p.pid}) parece ser do sistema. Encerrá-lo pode causar instabilidade. Continuar?`);
+        if (!confirmKill) return;
+      } else {
+        const confirmKill = confirm(`Encerrar "${p.name}" (PID: ${p.pid})?`);
+        if (!confirmKill) return;
+      }
+
+      if (typeof solicitarBloqueio === 'function') {
+        try { await solicitarBloqueio(); }
+        catch(err) { return; }
+      }
+
+      ws.send(JSON.stringify({ type: 'kill_process', pid: p.pid, name: p.name }));
+      
+      // Feedback visual instantâneo
+      card.style.opacity = '0.4';
+      card.style.pointerEvents = 'none';
+      killBtn.innerHTML = '<i data-lucide="loader" style="width:16px; height:16px; animation: spin 1s linear infinite;"></i>';
+      lucide.createIcons({ nodes: [killBtn] });
     });
-    
-    processTableBody.appendChild(tr);
+
+    processList.appendChild(card);
   });
-  
+
   lucide.createIcons();
 }
 
-btnKillProcess.addEventListener('click', async () => {
-  if (!ws || !selectedPid) return;
-  
-  if (btnKillProcess.dataset.isSystem === 'true') {
-    const confirmKill = confirm(`ATENÇÃO: O processo "${selectedProcessName}" (PID: ${selectedPid}) parece ser do sistema. Encerrá-lo pode causar instabilidade ou fechar o agente. Tem certeza?`);
-    if (!confirmKill) return;
-  }
-
-  if (typeof solicitarBloqueio === 'function') {
-    try { await solicitarBloqueio(); } 
-    catch(e) { return; }
-  }
-
-  ws.send(JSON.stringify({ type: 'kill_process', pid: selectedPid, name: selectedProcessName }));
-});
+// Busca de processos em tempo real
+if (processSearch) {
+  processSearch.addEventListener('input', (e) => {
+    renderProcesses(allProcesses, e.target.value);
+  });
+}
 
 // --- ARQUIVOS ---
 const fileUploadInput = document.getElementById('file-upload-input');
